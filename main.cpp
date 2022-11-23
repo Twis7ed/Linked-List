@@ -1,101 +1,121 @@
 #include <iostream>
 
-template<typename T>
-class List
+namespace tds 
 {
-private:
-    struct Node
+    template <typename T>
+    class linklist
     {
-        T data;
-        Node* link;
-    };
-    
-    Node* point = new Node;
-    Node* head = point;
-    Node* temp = point;
-    int length{};
-    
-public:
-    void create(int nodes)
-    {
-        for (int i{}; i < nodes -1; i++)
+    private:
+        struct Node
         {
-            point = new Node;
-            temp->link = point;
-            temp = temp->link;
+            T data;
+            Node* tail;
+        };
+        
+        Node* head;
+        
+    public:
+        linklist (int nodes)
+        {
+            if (nodes != 0)
+            {
+                head = new Node;
+                Node* point{ head };
+                Node* link{ point };
+                
+                for (int i{}; i < nodes; i++)
+                {
+                    point = new Node;
+                    link->tail = point;
+                    link = link->tail;
+                }
+                
+                point->tail = nullptr;
+            }
+            else
+                head = nullptr;
+            
+            return;
         }
         
-        point->link = NULL;
-        length = { nodes };
-        return;
-    }
-    
-    void setItem(int itemId, int newItem)
-    {
-        temp = head;
-        for(int i{}; i < itemId -1; i++)
-            temp = temp->link;
-            
-        temp->data = newItem;
-        return;
-    }
-    
-    T grabItem(int itemId)
-    {
-        temp = head;
-        for (int i{}; i< itemId -1; i++)
-            temp = temp->link;
-            
-        return temp->data;
-    }
-    
-    void print()
-    {
-        temp = head;
-        for (int i{}; i < length; i++)
+        linklist (const linklist& copy)
         {
+            Node* temp{ copy.head };
+            if (temp != nullptr)
+            {
+                head = new Node;
+                Node* point{ head };
+                Node* link{ point };
+                point->data = copy.head->data;
+                
+                while (temp->tail != nullptr)
+                {
+                    point = new Node;
+                    temp = temp->tail;
+                    point->data = temp->data;
+                    link->tail = point;
+                    link = link->tail;
+                }
+                
+                point->tail = nullptr;
+            }
+            else
+                head = nullptr;
+            
+            return;
+        }
+        
+        ~linklist()
+        {
+            while (head != nullptr)
+            {
+                Node* temp{ head };
+                head = head->tail;
+                delete temp;
+            }
+            
+            delete head;
+            return;
+        }
+        
+        T grabItem (int node)
+        {
+            Node* temp{ head };
+            for (int i{}; i < node; i++)
+                temp = temp->tail;
+                
+            return temp->data;
+        }
+        
+        void setItem (int node, T data)
+        {
+            Node* temp{ head };
+            for (int i{}; i < node; i++)
+                temp = temp->tail;
+                
+            temp->data = data;
+            return;
+        }
+        
+        void print (int node)
+        {
+            Node* temp{ head };
+            for (int i{}; i < node; i++)
+                temp = temp->tail;
+            
             std::cout << temp->data;
-            temp = temp->link;
-            
-            if (i != length -1)
-                std::cout << ", ";
+            return;
         }
-        return;
-    }
-    
-    void print(int itemId)
-    {
-        temp = head;
-        for (int i{}; i < itemId; i++)
-            temp = temp->link;
-            
-        std::cout << temp->data;
-        return;
-    }
-};
-
-void fibSeq(int terms)
-{
-    List<int> list;
-
-    list.create(3);
-    list.setItem(1, 0);
-    list.setItem(2, 1);
-    
-    for(int i{}; i < terms; i++)
-    {
-        list.setItem(3, list.grabItem(1) + list.grabItem(2));
-        list.print(1);
-        
-        list.setItem(1, list.grabItem(2));
-        list.setItem(2, list.grabItem(3));
-        
-        if (i != terms -1)
-            std::cout << ", ";
-    }
+    };
 }
 
 int main()
 {
-    fibSeq(10);
+    tds::linklist<int> list1(1);
+    list1.setItem(0, 1);
+    
+    tds::linklist<int> list2{ list1 };
+    list2.print(0);
+    
+    return 0;
 }
