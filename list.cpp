@@ -1,9 +1,9 @@
 #include <iostream>
 
-namespace tds 
+namespace tds
 {
-    template <typename T>
-    class linklist
+    template<typename T, std::size_t Elements>
+    class list
     {
     private:
         struct Node
@@ -15,38 +15,69 @@ namespace tds
         Node* head;
         
     public:
-        linklist (int nodes)
+        list()
         {
-            if (nodes != 0)
+            if (Elements > 0)
             {
                 head = new Node;
-                Node* point{ head };
-                Node* link{ point };
+                Node* temp{ head };
+                Node* link{ head };
                 
-                for (int i{}; i < nodes; i++)
+                for (int i{}; i < Elements -1; i++)
                 {
-                    point = new Node;
-                    link->tail = point;
+                    temp = new Node;
+                    link->tail = temp;
                     link = link->tail;
                 }
                 
-                point->tail = nullptr;
+                temp->tail = nullptr;
             }
             else
                 head = nullptr;
-            
+                
             return;
         }
         
-        linklist (const linklist& copy)
+        list (const std::initializer_list<T>& init)
+        {
+            if (Elements > 0)
+            {
+                head = new Node;
+                Node* temp{ head };
+                Node* link{ head };
+                
+                for (int i{}; i < Elements -1; i++)
+                {
+                    temp = new Node;
+                    link->tail = temp;
+                    link = link->tail;
+                }
+                
+                temp->tail = nullptr;
+                temp = head;
+                
+                for (auto data : init)
+                {
+                    temp->data = data;
+                    temp = temp->tail;
+                }
+            }
+            else
+                head = nullptr;
+                
+            return;
+        }
+        
+        list (const list& copy)
         {
             Node* temp{ copy.head };
             if (temp != nullptr)
             {
                 head = new Node;
+                head->data = copy.head->data;
+                
                 Node* point{ head };
-                Node* link{ point };
-                point->data = copy.head->data;
+                Node* link{ head };
                 
                 while (temp->tail != nullptr)
                 {
@@ -61,11 +92,40 @@ namespace tds
             }
             else
                 head = nullptr;
-            
+                
             return;
         }
         
-        ~linklist()
+        int size()
+        {
+            int elements{};
+            Node* temp{ head };
+            
+            if (temp != nullptr)
+            {
+                while (temp != nullptr)
+                {
+                    temp = temp->tail;
+                    elements++;
+                }
+            }
+            
+            return elements;
+        }
+        
+        T& operator[] (const int& node)
+        {
+            Node* temp{ head };
+            if (temp != nullptr)
+            {
+                for (int i{}; i < node; i++)
+                    temp = temp->tail;
+            }
+            
+            return temp->data;
+        }
+        
+        ~list()
         {
             while (head != nullptr)
             {
@@ -77,45 +137,29 @@ namespace tds
             delete head;
             return;
         }
-        
-        T grabItem (int node)
-        {
-            Node* temp{ head };
-            for (int i{}; i < node; i++)
-                temp = temp->tail;
-                
-            return temp->data;
-        }
-        
-        void setItem (int node, T data)
-        {
-            Node* temp{ head };
-            for (int i{}; i < node; i++)
-                temp = temp->tail;
-                
-            temp->data = data;
-            return;
-        }
-        
-        void print (int node)
-        {
-            Node* temp{ head };
-            for (int i{}; i < node; i++)
-                temp = temp->tail;
-            
-            std::cout << temp->data;
-            return;
-        }
     };
 }
 
 int main()
 {
-    tds::linklist<int> list1(1);
-    list1.setItem(0, 1);
+    tds::list<int, 3> fib{ 0, 1 };
+    for (int i{}; i < 10; i++)
+    {
+        fib[2] = fib[0] + fib[1];
+        std::cout << fib[0];
+        
+        fib[0] = fib[1];
+        fib[1] = fib[2];
+        
+        if (i != 9)
+            std::cout << ", ";
+    }
     
-    tds::linklist<int> list2{ list1 };
-    list2.print(0);
+    std::cout << std::endl;
+    tds::list<int, 3> foo{ fib };
+    
+    for (int i{}; i < foo.size(); i++)
+        std::cout << foo[i] << ", ";
     
     return 0;
 }
