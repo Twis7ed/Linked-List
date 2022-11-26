@@ -140,7 +140,7 @@ namespace tds
     };
 }
 
-int main()
+int main() // Quick Test
 {
     tds::list<int, 3> fib{ 0, 1 };
     for (int i{}; i < 10; i++)
